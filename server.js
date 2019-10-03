@@ -1,15 +1,18 @@
 'use strict';
 
-const express     = require('express');
-const bodyParser  = require('body-parser');
-const expect      = require('chai').expect;
-const cors        = require('cors');
-const dotenv = require('dotenv');
+const express           = require('express');
+const bodyParser        = require('body-parser');
+const expect            = require('chai').expect;
+const cors              = require('cors');
+const dotenv            = require('dotenv');
 dotenv.config();
 
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
+
+const connectDB = require('./models/index.js').connectDB;
+const models    = require('./models/index.js').models;
 
 const app = express();
 
@@ -46,20 +49,22 @@ app.use(function(req, res, next) {
 });
 
 //Start our server and tests!
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Listening on port " + process.env.PORT);
-  if(process.env.NODE_ENV==='test') {
-    console.log('Running Tests...');
-    setTimeout(function () {
-      try {
-        runner.run();
-      } catch(e) {
-        var error = e;
-          console.log('Tests are not valid:');
-          console.log(error);
-      }
-    }, 3500);
-  }
+connectDB().then(async () => {
+  app.listen(process.env.PORT || 3000, function () {
+    console.log("Listening on port " + process.env.PORT);
+    if(process.env.NODE_ENV==='test') {
+      console.log('Running Tests...');
+      setTimeout(function () {
+        try {
+          runner.run();
+        } catch(e) {
+          var error = e;
+            console.log('Tests are not valid:');
+            console.log(error);
+        }
+      }, 3500);
+    }
+  });
 });
 
 module.exports = app; //for testing

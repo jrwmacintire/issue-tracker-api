@@ -14,7 +14,6 @@ const expect = require('chai').expect;
 const ObjectId = require('mongodb').ObjectID;
 const mongoose = require('mongoose');
 mongoose.set('useUnifiedTopology', true);
-mongoose.connect(DB_URL, { useNewUrlParser: true });
 
 const IssueHandler = require('../controllers/issueHandler.js');
 const issueHandler = new IssueHandler();
@@ -24,57 +23,76 @@ module.exports = function (app) {
   app.route('/api/issues/:project')
   
     .get(function (req, res){
-      const projectName = req.params.project;
+      const projectName = req.params.project,
+            body        = req.body;
       console.log(`'GET' request received! | project: ${projectName}`);
-      // mongoose.connect(DB_URL, { useNewUrlParser: true });
-      const db = mongoose.connection;
-      db.on('open', async function() {
-        console.log('Connected DB!');
-      });
     })
     
     .post(async function (req, res){
-      const projectName = req.params.project;
+      const projectName = req.params.project,
+            body        = req.body;
+
+      const validatedBody = issueHandler.validateBody(body);
+      
       console.log(`'POST' request received! | project: ${projectName}`);
 
-      mongoose.connect(DB_URL, { useNewUrlParser: true });
-      const db = mongoose.connection;
-
-      db.on('error', console.error.bind(console, 'MongoDB/Mongoose connection error!'));
-
-      db.on('open', async function() {
-        console.log('Connected DB!');
-        let response = {};
-        const dummyResponse = {
-          issue_title: 'Title',
-          issue_text: 'text',
-          created_by: 'Functional Test - Every field filled in',
-          assigned_to: 'Chai and Mocha',
-          status_text: 'In QA'
-        };
+      if(validatedBody) {
 
         try {
-          const project = await issueHandler.findProject(projectName);
-          // TODO: Create an issue with the 'Issue' model and link the issue to the current project.
-          res.json(dummyResponse);
+
+          
+          const project = await issueHandler.getProject(projectName, true);
+          const projectId = project.id;
+          const issues = [...project.issues];
+          
+          const issueBody = {
+            issue_title: body.issue_title,
+            issue_text: body.issue_text,
+            created_by: body.created_by,
+            assigned_to: body.assigned_to || '',
+            status_text: body.status_text || '',
+            project_id: projectId
+          };
+
+          const issue = issueHandler.getIssueByTitle(body.issue_title);
+
+          if(issue) {
+            // console.log(`issue found!: `, issue);
+          } else {
+            // console.log(`issue NOT found!: `, issue);
+
+          }
+
+          // TODO: 
+          // make new 'issue' with values from body
+          // include ObjectId from current 'project'
+          // add 'issue.id' to 'project.issues' array
+
+          // issueHandler.addNewIssueToProject(project, newIssue);
+
+          res.json(issueBody);
+
         } catch(err) {
           throw err;
         }
 
-      });
+      } else {
+        // throw Error(`Invalid 'body' given for input!`);
+        res.status(501).json({ error: `Please fill in all required fields.` });
+      }
 
     })
     
     .put(function (req, res){
-      const projectName = req.params.project;
+      const projectName = req.params.project,
+            body        = req.body;
       console.log(`'PUT' request received! | project: ${projectName}`);
-      mongoose.connect(DB_URL, { useNewUrlParser: true });
+
     })
     
     .delete(function (req, res){
       const projectName = req.params.project;
       console.log(`'DELETE' request received! | project: ${projectName}`);
-      mongoose.connect(DB_URL, { useNewUrlParser: true });
     });
     
 };
