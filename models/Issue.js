@@ -15,8 +15,5 @@ const issueSchema = new Schema(
   }
 );
 
-issueSchema.statics.getIssue = () => { 
-  console.log(`Getting the '${this.issue_title}' issue! (project: ADD PROJECT NAME)`);
-};
 
 module.exports = mongoose.model('Issue', issueSchema);

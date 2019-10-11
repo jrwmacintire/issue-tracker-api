@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const projectSchema = new Schema(
   {
     project_name: { type: String, unique: true },
-    issues: [{ type: Schema.Types.ObjectId, ref: 'Issue' }]
+    issueIds: [{ type: Schema.Types.ObjectId, ref: 'Issue' }]
   }
 );
 

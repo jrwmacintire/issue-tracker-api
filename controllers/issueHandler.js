@@ -1,10 +1,11 @@
 const Project = require('../models/Project.js');
 const Issue = require('../models/Issue.js');
+const ObjectId = require('mongodb').ObjectID;
 
 function IssueHandler() {
 
-    this.getProject = async (name, makeNewProject) => {
-        console.log(`'findProject' - name: ${name}`);
+    this.getProjectByName = async (name, makeNewProject) => {
+        // console.log(`'getProjectByName' - name: ${name}`);
 
         try {
             const project = await Project.findOne({ project_name: name });
@@ -32,9 +33,35 @@ function IssueHandler() {
         }
     };
 
+    this.updateProjectIssues = async (name, issueId) => {
+        try {
+            if(issueId === null || issueId === undefined) {
+                throw Error(`Please provide a valid 'issueId'`);
+            }
+            const updatedProject = await Project.findOneAndUpdate({ project_name: name },{ $push: { issueIds: issueId }, $set: { updated_on: new Date }});
+            return updatedProject;
+        } catch(err) {
+            throw err;
+        }
+    };
+
     this.deleteProject = async (name) => {
         try {
             await Project.findOneAndDelete({ project_name: name });
+        } catch(err) {
+            throw err;
+        }
+    }
+
+    this.deleteAllIssuesFromProject = async (name) => {
+        try {
+            const project = await Project.findOne({ project_name: name });
+            const projectId = project.id;
+            await Issue.deleteMany({ project_id: projectId }, function(err) {
+                if(err) throw err;
+                console.log(`Issues deleted from '${name}' project`);
+            });
+            await Project.updateOne({ project_name: name }, { $set: { issueIds: new Array() }});
         } catch(err) {
             throw err;
         }
@@ -62,6 +89,67 @@ function IssueHandler() {
         }
     };
 
+    this.getIssueByID = async (id) => {
+        try {
+            return await Issue.findOne({ _id: id });
+        } catch(err) {
+            throw err;
+        }
+    };
+
+    this.updateIssueUpdatedOnDate = async (issue) => {
+        try {
+            issue.updated_on = new Date();
+            await issue.save();
+            return issue;
+        } catch(err) {
+            throw err;
+        }
+    };
+
+    this.updateIssueFromBody = async (issue, body) => {
+        try {
+            // console.log(`Updating these input fields: `, inputs);
+            const fields = Object.keys(body);
+            fields.forEach((field, index) => {
+                if(issue.hasOwnProperty(field)) {
+                    switch(field) {
+                        case '_id':
+                            break;
+                        case 'issue_title':
+                            issue.issue_title = inputs.issue_title;
+                            break;
+                        case 'issue_text':
+                            issue.issue_text = inputs.issue_text;
+                            break;
+                        case 'updated_on':
+                            issue.updated_on = inputs.updated_on;
+                            break;
+                        case 'created_on':
+                            issue.created_on = inputs.created_on;
+                            break;
+                        case 'open':
+                            issue.open = inputs.open;
+                            break;
+                        case 'assigned_to':
+                            issue.assigned_to = inputs.assigned_to;
+                            break;
+                        case 'created_by':
+                            issue.created_by = inputs.created_by;
+                            break;
+                        default:
+                            return `No '${field}' found in issue`;
+                    }
+                } else {
+                    throw Error(`Missing the '${field}' field in current issue! `, issue);
+                }
+            }); 
+            await issue.save();
+        } catch(err) {
+            throw err;
+        }
+    };
+
     this.deleteIssueByTitle = async (title) => {
         try {
             await Issue.deleteOne({ issue_title: title }, () => {
@@ -72,35 +160,15 @@ function IssueHandler() {
         }
     }
 
-    this.deleteAllIssuesFromProject = async (name) => {
-        try {
-
-            // TODO: search Issue DB for matching issues w/ ID
-            // all issues found will be deleted
-
-            const project = await Project.findOne({ project_name: name });
-            if(project) {
-                const issues = [...project.issues];
-                if(issues.length < 1) {
-                    return;
-                } else {
-                    // remove all issues by ID here
-                }
-            }
-        } catch(err) {
-            throw err;
-        }
-    }
-
     this.deleteIssueById = async (id) => {
         try {
-            await Issue.deleteOne({ _id: id }, () => {
+            await Issue.findOneAndDelete({ _id: id }, () => {
                 console.log(`Delete successful for '${issue}' issue!`)
             });
         } catch(err) {
             throw err;
         }
-    }
+    };
 
     this.validateBody = (body) => {
         const validTitle   = (body.issue_title !== undefined && body.issue_title !== '');
