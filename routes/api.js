@@ -22,10 +22,35 @@ module.exports = function (app) {
 
   app.route('/api/issues/:project')
   
-    .get(function (req, res){
+    .get(async function (req, res){
       const projectName = req.params.project,
             body        = req.body;
       console.log(`'GET' request received! | project: ${projectName}`);
+
+      try {
+        const project = await issueHandler.getProjectByName(projectName);
+        const issueIds = [...project.issueIds].map(issueID => issueID.toString());
+        if(project) {
+          const filters = Object.keys(body);
+          // GET requests without filters
+          if(body === {} || filters.length === 0) {
+            const promises = issueIds.map(id => issueHandler.getIssueByID(id));
+            const issues = await Promise.all(promises);
+            res.json(issues);
+          }
+          // GET requests with filters 
+          else {
+            
+            
+            res.send('Add filters for GET requests around here');
+          }
+        } else {
+          throw Error('No project found. Please adjust your input.');
+        }
+      } catch(err) {
+        res.send(err);
+      }
+
     })
     
     .post(async function (req, res){
@@ -125,17 +150,35 @@ module.exports = function (app) {
 
         try {
           const issue = await issueHandler.getIssueByID(body._id);
+          await issueHandler.updateIssueUpdatedOnDate(issue);
           if(issue && inputsOnBody === 1) {
-            await issueHandler.updateIssueUpdatedOnDate(issue);
-            res.json('Successfully updated issue!');
+            res.json({
+              message: 'Successfully updated issue!',
+              update: {
+                issue_title: issue.issue_title,
+                issue_text: issue.issue_text,
+                created_by: issue.created_by,
+                assigned_to: issue.assigned_to,
+                status_text: issue.status_text
+              }
+            });
           } else if(issue && inputsOnBody > 1) {
-            await issueHandler.updateIssueUpdatedOnDate(issue);
             // validate and update all other inputs on issue
-            console.log(`'inputs' from 'body': `, inputs, body);
+            // console.log(`'inputs' from 'body': `, inputs, body);
             const validInputs = validateInputs();
             if(validInputs) {
-              await issueHandler.updateIssueFromBody(issue, body);
-              // res.json('Successfully updated issue!');
+              const updatedIssue = await issueHandler.updateIssueFromBody(issue, body);
+              const response = {};
+              res.json({
+                message: 'Successfully updated issue!',
+                update: {
+                  issue_title: updatedIssue.issue_title,
+                  issue_text: updatedIssue.issue_text,
+                  created_by: updatedIssue.created_by,
+                  assigned_to: updatedIssue.assigned_to,
+                  status_text: updatedIssue.status_text
+                }
+              });
             } else {
               throw Error('Invalid inputs found. Please revise your inputs.');
             }
@@ -147,7 +190,7 @@ module.exports = function (app) {
         }
 
       } else {
-        res.json('No update input(s) given. Please try again.');
+        res.json({ message: 'No update input(s) given. Please try again.' });
         // throw Error('No update input given. Please try again.');
       }
 

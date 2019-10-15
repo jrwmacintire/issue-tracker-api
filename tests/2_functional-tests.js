@@ -116,7 +116,7 @@ suite('Functional Tests', function() {
           .send({})
           .end(function(err, res) {
             // console.log(`res: `, res);
-            assert.equal(res.body, 'No update input(s) given. Please try again.');
+            assert.equal(res.body.message, 'No update input(s) given. Please try again.');
             done();
           });
       });
@@ -126,8 +126,13 @@ suite('Functional Tests', function() {
           .put('/api/issues/test')
           .send({ _id: issueID })
           .end(function(err, res) {
-            // console.log(`res: `, res);
-            assert.equal(res.body, `Successfully updated issue!`);
+            // console.log(`res.body: `, res.body);
+            assert.equal(res.body.message, `Successfully updated issue!`);
+            assert.equal(res.body.update.issue_title, 'Title');
+            assert.equal(res.body.update.issue_text, 'text');
+            assert.equal(res.body.update.created_by, 'Functional Test - Every field filled in');
+            assert.equal(res.body.update.assigned_to, 'Chai and Mocha');
+            assert.equal(res.body.update.status_text, 'In QA');
             done();
           });
       });
@@ -141,7 +146,13 @@ suite('Functional Tests', function() {
             assigned_to: 'Myah'
           })
           .end(function(err, res) {
-            assert.equal(res.body, `Successfully updated issue!`);
+            // console.log(`res.body: `, res.body);
+            assert.equal(res.body.message, `Successfully updated issue!`);
+            assert.equal(res.body.update.issue_title, 'Title');
+            assert.equal(res.body.update.issue_text, 'Some new text here');
+            assert.equal(res.body.update.created_by, 'Functional Test - Every field filled in');
+            assert.equal(res.body.update.assigned_to, 'Myah');
+            assert.equal(res.body.update.status_text, 'In QA');
             done();
           });
       });
@@ -168,33 +179,46 @@ suite('Functional Tests', function() {
           assert.property(res.body[0], '_id');
           done();
         });
-        // done();
-
       });
       
       test('One filter', function(done) {
-        // chai.request(server)
-        //   .get('/api/issues/test')
-        //   .query({})
-        //   .end(function(err, res){
-        //     assert.equal(res.status, 200);
-        //     assert.isArray(res.body);
-        //     assert.property(res.body[0], 'issue_title');
-        //     assert.property(res.body[0], 'issue_text');
-        //     assert.property(res.body[0], 'created_on');
-        //     assert.property(res.body[0], 'updated_on');
-        //     assert.property(res.body[0], 'created_by');
-        //     assert.property(res.body[0], 'assigned_to');
-        //     assert.property(res.body[0], 'open');
-        //     assert.property(res.body[0], 'status_text');
-        //     assert.property(res.body[0], '_id');
-        //     done();
-        //   });
-        // done();
+        chai.request(server)
+          .get('/api/issues/test')
+          .query({ open: true })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.isArray(res.body);
+            assert.property(res.body[0], 'issue_title');
+            assert.property(res.body[0], 'issue_text');
+            assert.property(res.body[0], 'created_on');
+            assert.property(res.body[0], 'updated_on');
+            assert.property(res.body[0], 'created_by');
+            assert.property(res.body[0], 'assigned_to');
+            assert.property(res.body[0], 'open');
+            assert.property(res.body[0], 'status_text');
+            assert.property(res.body[0], '_id');
+            done();
+          });
       });
       
       test('Multiple filters (test for multiple fields you know will be in the db for a return)', function(done) {
-        // done();
+        chai.request(server)
+          .get('/api/issues/test')
+          .query({})
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.isArray(res.body);
+            assert.property(res.body[0], 'issue_title');
+            assert.property(res.body[0], 'issue_text');
+            assert.property(res.body[0], 'created_on');
+            assert.property(res.body[0], 'updated_on');
+            assert.property(res.body[0], 'created_by');
+            assert.property(res.body[0], 'assigned_to');
+            assert.property(res.body[0], 'open');
+            assert.property(res.body[0], 'status_text');
+            assert.property(res.body[0], '_id');
+            // done();
+          });
       });
       
     });

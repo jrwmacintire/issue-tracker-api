@@ -112,39 +112,36 @@ function IssueHandler() {
             // console.log(`Updating these input fields: `, inputs);
             const fields = Object.keys(body);
             fields.forEach((field, index) => {
-                if(issue.hasOwnProperty(field)) {
-                    switch(field) {
-                        case '_id':
-                            break;
-                        case 'issue_title':
-                            issue.issue_title = inputs.issue_title;
-                            break;
-                        case 'issue_text':
-                            issue.issue_text = inputs.issue_text;
-                            break;
-                        case 'updated_on':
-                            issue.updated_on = inputs.updated_on;
-                            break;
-                        case 'created_on':
-                            issue.created_on = inputs.created_on;
-                            break;
-                        case 'open':
-                            issue.open = inputs.open;
-                            break;
-                        case 'assigned_to':
-                            issue.assigned_to = inputs.assigned_to;
-                            break;
-                        case 'created_by':
-                            issue.created_by = inputs.created_by;
-                            break;
-                        default:
-                            return `No '${field}' found in issue`;
-                    }
-                } else {
-                    throw Error(`Missing the '${field}' field in current issue! `, issue);
+                switch(field) {
+                    case '_id':
+                        break;
+                    case 'issue_title':
+                        issue.issue_title = body.issue_title;
+                        break;
+                    case 'issue_text':
+                        issue.issue_text = body.issue_text;
+                        break;
+                    case 'updated_on':
+                        issue.updated_on = body.updated_on;
+                        break;
+                    case 'created_on':
+                        issue.created_on = body.created_on;
+                        break;
+                    case 'open':
+                        issue.open = body.open;
+                        break;
+                    case 'assigned_to':
+                        issue.assigned_to = body.assigned_to;
+                        break;
+                    case 'created_by':
+                        issue.created_by = body.created_by;
+                        break;
+                    default:
+                        return `No '${field}' found in issue`;
                 }
             }); 
             await issue.save();
+            return issue;
         } catch(err) {
             throw err;
         }
