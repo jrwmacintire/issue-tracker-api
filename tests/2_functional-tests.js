@@ -197,14 +197,17 @@ suite('Functional Tests', function() {
             assert.property(res.body[0], 'open');
             assert.property(res.body[0], 'status_text');
             assert.property(res.body[0], '_id');
-            // done();
+            done();
           });
       });
       
       test('Multiple filters (test for multiple fields you know will be in the db for a return)', function(done) {
         chai.request(server)
           .get('/api/issues/test')
-          .query({})
+          .query({ open: true,
+                   created_by: "Functional Test - Every field filled in",
+                   assigned_to: 'Myah'
+                  })
           .end(function(err, res){
             assert.equal(res.status, 200);
             assert.isArray(res.body);
@@ -217,28 +220,81 @@ suite('Functional Tests', function() {
             assert.property(res.body[0], 'open');
             assert.property(res.body[0], 'status_text');
             assert.property(res.body[0], '_id');
-            // done();
+            done();
+          });
+      });
+
+      test('Multiple filters - 2', function(done) {
+        chai.request(server)
+          .get('/api/issues/test')
+          .query({ open: true,
+                   created_by: 'john',
+                   issue_text: 'test text'
+                  })
+          .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.isArray(res.body);
+            assert.property(res.body[0], 'issue_title');
+            assert.property(res.body[0], 'issue_text');
+            assert.property(res.body[0], 'created_on');
+            assert.property(res.body[0], 'updated_on');
+            assert.property(res.body[0], 'created_by');
+            assert.property(res.body[0], 'assigned_to');
+            assert.property(res.body[0], 'open');
+            assert.property(res.body[0], 'status_text');
+            assert.property(res.body[0], '_id');
+            done();
           });
       });
       
     });
     
     suite('DELETE /api/issues/{project} => text', function() {
+
+      let issueID;
+
+      this.beforeAll(function(done) {
+        issueHandler.getIssueByTitle('Title')
+          .then(issue => {
+            // console.log(`issue: `, issue);
+            issueID = issue._id;
+            // console.log(`issue._id: ${issueID}`);
+            done();
+          })
+          .catch(done);
+      });
       
       test('No _id', function(done) {
-        // chai.request(server)
-        //   .delete('/api/issues/test')
-        // done();
+        chai.request(server)
+          .delete('/api/issues/test')
+          .query({})
+          .end(function(err, res) {
+            assert.equal(res.status, 504);
+            assert.equal(res.body, 'ID error deleting issue!');
+            done();
+          });
       });
       
       test('Valid _id', function(done) {
-        // chai.request(server)
-        //   .delete('/api/issues/test')
-        //   .end(function(err, res) {
-        //     assert.equal(res.status, 200);
-        //     done();
-        //   });
-        done();
+        chai.request(server)
+          .delete('/api/issues/test')
+          .query({ _id: issueID })
+          .end(function(err, res) {
+            assert.equal(res.status, 200);
+            assert.equal(res.body, 'Successfully deleted issue!');
+            done();
+          });
+      });
+
+      test('Invalid _id', function(done) {
+        chai.request(server)
+          .delete('/api/issues/test')
+          .query({ _id: 12345 })
+          .end(function(err, res) {
+            assert.equal(res.status, 503);
+            assert.equal(res.body, 'Failed to find issue in current project with the given ID.');
+            done();
+          });
       });
       
     });

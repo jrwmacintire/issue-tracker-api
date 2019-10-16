@@ -51,7 +51,7 @@ function IssueHandler() {
         } catch(err) {
             throw err;
         }
-    }
+    };
 
     this.deleteAllIssuesFromProject = async (name) => {
         try {
@@ -65,7 +65,7 @@ function IssueHandler() {
         } catch(err) {
             throw err;
         }
-    }
+    };
 
     this.createIssue = async (body) => {
         const issue = new Issue({
@@ -97,18 +97,44 @@ function IssueHandler() {
         }
     };
 
-    this.getIssuesWithFilters = async (body) => {
+    this.getIssuesWithFilterQuery = async (query) => {
         try {
-            const filters = Object.keys(body)
-                                  .map(key => {
-                                      return {
-                                          key: body[key]
-                                      }
-                                  });
-            return false;                      
+            // Make initial filter, query issues
+            const filterKeys = Object.keys(query);
+            let initialFilter = {};
+            const initialKey = filterKeys[0];
+            initialFilter[initialKey] = query[initialKey];
+            const initialBatch = await Issue.find(initialFilter);
+            // Return initial batch for single filter queries
+            if(filterKeys.length === 1) return initialBatch;
+            // Filter issues batch down with remaining filters
+            else if(filterKeys.length > 1) {
+                let filteredBatch = initialBatch.reduce((filtered, issue, index) => {
+                    const issuePassesFilters = this.issuePassesFilters(issue, query);
+                    if(issuePassesFilters) filtered.push(issue);
+                    return filtered;
+                }, []);
+                return filteredBatch;
+            } 
+            // Throw error when a batch isn't returned
+            else {
+                throw Error('Failed to filter issues fully!');
+            }                      
         } catch(err) {
             throw err;
         }
+    };
+
+    this.issuePassesFilters = (issue, query) => {
+        let valid = true;
+        const filterKeys = Object.keys(query);
+        const filterVals = Object.values(query);
+        filterKeys.forEach((key, index) => {
+            let currVal = filterVals[index];
+            if(currVal === 'true') currVal = true;
+            if(issue[key] !== currVal) valid = false;
+        });
+        return valid;
     };
 
     this.updateIssueUpdatedOnDate = async (issue) => {
@@ -169,7 +195,7 @@ function IssueHandler() {
         } catch(err) {
             throw err;
         }
-    }
+    };
 
     this.deleteIssueById = async (id) => {
         try {

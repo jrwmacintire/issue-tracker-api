@@ -24,31 +24,27 @@ module.exports = function (app) {
   
     .get(async function (req, res){
       const projectName = req.params.project,
-            body        = req.body,
             query       = req.query;
-      console.log(`'GET' request received! | project: ${projectName}`);
+      // console.log(`'GET' request received! | project: ${projectName}`);
 
       try {
         const project = await issueHandler.getProjectByName(projectName);
         const issueIds = [...project.issueIds].map(issueID => issueID.toString());
         if(project) {
           // GET requests without filters
-          if(Object.keys(body).length === 0) {
+          if(Object.keys(query).length === 0) {
             const promises = issueIds.map(id => issueHandler.getIssueByID(id));
             const issues = await Promise.all(promises);
             res.json(issues);
           }
           // GET requests with filters 
           else {
-            try {
-              const filteredIssues = await issueHandler.getIssuesWithFilters(body);
-              res.json(filteredIssues);
-            } catch(err) {
-              throw err;
-            }
+            const filteredIssues = await issueHandler.getIssuesWithFilterQuery(query);
+            res.json(filteredIssues);
           }
         } else {
-          throw Error('No project found. Please adjust your input.');
+          throw err;
+          // throw Error('No project found. Please adjust your input.');
         }
       } catch(err) {
         res.send(err);
@@ -201,16 +197,27 @@ module.exports = function (app) {
     
     .delete(async function (req, res){
       const projectName = req.params.project;
-      console.log(`'DELETE' request received! | project: ${projectName}`);
-      const issueId = req.body._id;
+      // console.log(`'DELETE' request received! | project: ${projectName}`);
 
       try {
-        const issue = await issueHandler.deleteIssueById(issueId);
+        if(!req.query._id) res.status(504).json('ID error deleting issue!');
+        else {
+          const project = await issueHandler.getProjectByName(projectName);
+          const projectIssues = project.issueIds.map(id => id.toString());
+          const issueId = req.query._id.toString();
+          const foundInProjectIssues = projectIssues.indexOf(issueId) >= 0;
+          if(foundInProjectIssues) {
+
+
+            res.json(`Successfully deleted issue!`);
+          } else {
+            res.status(503).json(`Failed to find issue in current project with the given ID.`)
+          }
+        }
       } catch(err) {
-        throw err;
+        res.json(err);
       }
 
-      res.send('Testing DELETE method on route');
     });
     
 };
