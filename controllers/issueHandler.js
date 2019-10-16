@@ -97,6 +97,20 @@ function IssueHandler() {
         }
     };
 
+    this.getIssuesWithFilters = async (body) => {
+        try {
+            const filters = Object.keys(body)
+                                  .map(key => {
+                                      return {
+                                          key: body[key]
+                                      }
+                                  });
+            return false;                      
+        } catch(err) {
+            throw err;
+        }
+    };
+
     this.updateIssueUpdatedOnDate = async (issue) => {
         try {
             issue.updated_on = new Date();

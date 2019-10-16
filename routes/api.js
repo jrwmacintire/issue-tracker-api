@@ -24,25 +24,28 @@ module.exports = function (app) {
   
     .get(async function (req, res){
       const projectName = req.params.project,
-            body        = req.body;
+            body        = req.body,
+            query       = req.query;
       console.log(`'GET' request received! | project: ${projectName}`);
 
       try {
         const project = await issueHandler.getProjectByName(projectName);
         const issueIds = [...project.issueIds].map(issueID => issueID.toString());
         if(project) {
-          const filters = Object.keys(body);
           // GET requests without filters
-          if(body === {} || filters.length === 0) {
+          if(Object.keys(body).length === 0) {
             const promises = issueIds.map(id => issueHandler.getIssueByID(id));
             const issues = await Promise.all(promises);
             res.json(issues);
           }
           // GET requests with filters 
           else {
-            
-            
-            res.send('Add filters for GET requests around here');
+            try {
+              const filteredIssues = await issueHandler.getIssuesWithFilters(body);
+              res.json(filteredIssues);
+            } catch(err) {
+              throw err;
+            }
           }
         } else {
           throw Error('No project found. Please adjust your input.');
