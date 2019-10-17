@@ -257,7 +257,7 @@ suite('Functional Tests', function() {
         issueHandler.getIssueByTitle('Title')
           .then(issue => {
             // console.log(`issue: `, issue);
-            issueID = issue._id;
+            issueID = issue._id.toString();
             // console.log(`issue._id: ${issueID}`);
             done();
           })
@@ -280,6 +280,7 @@ suite('Functional Tests', function() {
           .delete('/api/issues/test')
           .query({ _id: issueID })
           .end(function(err, res) {
+            console.log(`res.body: `, res.body);
             assert.equal(res.status, 200);
             assert.equal(res.body, 'Successfully deleted issue!');
             done();

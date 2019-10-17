@@ -204,12 +204,11 @@ module.exports = function (app) {
         else {
           const project = await issueHandler.getProjectByName(projectName);
           const projectIssues = project.issueIds.map(id => id.toString());
-          const issueId = req.query._id.toString();
+          const issueId = req.query._id;
           const foundInProjectIssues = projectIssues.indexOf(issueId) >= 0;
           if(foundInProjectIssues) {
-
-
-            res.json(`Successfully deleted issue!`);
+            issueHandler.deleteIssueById(issueId);
+            res.json('Successfully deleted issue!');
           } else {
             res.status(503).json(`Failed to find issue in current project with the given ID.`)
           }

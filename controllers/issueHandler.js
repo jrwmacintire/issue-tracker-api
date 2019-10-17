@@ -200,7 +200,7 @@ function IssueHandler() {
     this.deleteIssueById = async (id) => {
         try {
             await Issue.findOneAndDelete({ _id: id }, () => {
-                console.log(`Delete successful for '${issue}' issue!`)
+                // console.log(`Delete successful for issue!`);
             });
         } catch(err) {
             throw err;
