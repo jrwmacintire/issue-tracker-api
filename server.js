@@ -7,6 +7,8 @@ const cors              = require('cors');
 const dotenv            = require('dotenv');
 dotenv.config();
 
+const helmet = require('helmet');
+
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
@@ -15,6 +17,8 @@ const connectDB = require('./models/index.js').connectDB;
 const models    = require('./models/index.js').models;
 
 const app = express();
+
+app.use(helmet.xssFilter());
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
