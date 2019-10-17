@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to HyperDev!</title>
+    <title>Issue Tracker API - JohnMacIntire.com</title>
     <meta name="description" content="A cool thing made with HyperDev">
     <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/public/style.css">
+    <link rel="stylesheet" type="text/css" href="public/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
   <body>
     <header>
       <h1 id='projectTitle'></h1>
     </header>
-    <center>
       <div id='submitNewIssue'>
         <br>
         <h3>Submit a new issue:</h3>
+        <!-- TODO: Update form with Bootstrap styling -->
         <form id="newIssue" method="post" action="/api/">
           <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;" required=''><br>
           <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;" required=''></textarea><br>
@@ -27,10 +28,10 @@
         </form>
       </div>
       
+      <!-- TODO: Improve layout of all issues on project page -->
       <div id='issueDisplay'></div>
       
-      <hr style='margin: 50px; margin-top: 200px'>
-    </center>
+      <hr>
     
     <script src="https://code.jquery.com/jquery-2.2.1.min.js"
             integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
@@ -50,6 +51,9 @@
               console.log(ele);
               var openstatus;
               (ele.open) ? openstatus = 'open' : openstatus = 'closed';
+              // TODO: Ensure that 'close' button closes issue
+              // TODO: Ensure that 'delete' button deletes issue
+              // TODO: Improve layout of issues
               var single = [
                 '<div class="issue '+openstatus+'">',
                 '<p class="id">id: '+ele._id+'</p>',
@@ -62,7 +66,6 @@
                 '<p class="id"><b>Created on:</b> '+ele.created_on+'  <b>Last updated:</b> '+ele.updated_on,
                 '<br><a href="#" class="closeIssue" id="'+ele._id+'">close?</a> <a href="#" class="deleteIssue" id="'+ele._id+'">delete?</a>',
                 '</div>'
-                
               ];
               issues.push(single.join(''));
             });

@@ -1,3 +1,112 @@
+$darkerturquoise: darken(darkturquoise, 15);
+
 body {
-    color: cyan;
+    font-size: 16px;
+
+    div.container {
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        code, li, p {
+            font-size: 1.1rem;
+        }
+
+        code {
+            color: mediumturquoise;
+        }
+
+        a {
+            color: $darkerturquoise;
+        }
+
+        section {
+
+            div.row {
+                display: flex;
+                justify-content: center;
+            } 
+        }
+
+        section:first-child {
+            margin-top: 4rem;
+        }
+
+        section:last-child {
+            margin-bottom: 4rem;
+        }
+
+        section#userstories {
+            div.examples {
+                background-color: ghostwhite;
+                padding: 1rem;
+                border: 1px solid lightgray;
+                margin-bottom: 2rem;
+
+                div {
+                    margin: 0.5rem;
+                }
+            }
+        }
+
+        section#testui {
+            margin: 4rem 0;
+
+            div.row > div {
+                min-width: 380px;
+            }
+
+            div > h3 > i {
+                color: $darkerturquoise;
+            }
+
+            div > h3 {
+                text-align: center;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+                
+                // div.form-group {
+                //     margin: 0;
+                // }
+
+                label {
+                    text-align: right;
+                    padding-left: 0;
+                }
+
+                button {
+                    padding: 0.4rem 1.4rem;
+                    color: white;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    letter-spacing: 1px;
+                    background-color: lighten(turquoise, 17);
+                    border: 1px solid ghostwhite;
+                    box-shadow: 0 2px 4px lightgray;
+                }
+
+                button:hover {
+                    background-color: lighten(turquoise, 11);
+                }
+
+                button:active {
+                    box-shadow: 0 0 2px lightgray;
+                }
+            }
+        }
+
+        section#footer {
+            margin-top: 3rem;
+            text-align: center;
+
+            a {
+                color: $darkerturquoise;
+            }
+        }
+    }   
 }

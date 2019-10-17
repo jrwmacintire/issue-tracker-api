@@ -60,6 +60,8 @@ module.exports = function (app) {
       
       // console.log(`'POST' request received! | project: ${projectName}`);
 
+      // TODO: Add error to server response when an issue with the current title already exists.
+
       if(validatedBody) {
 
         try {
@@ -83,11 +85,14 @@ module.exports = function (app) {
           if(issue) {
             // console.log(`issue found!: `, issue);
             response = {
-              issue_title: issue.issue_title,
-               issue_text: issue.issue_text,
-               created_by: issue.created_by,
-              assigned_to: issue.assigned_to,
-              status_text: issue.status_text
+              message: 'Issue found with that title.',
+              issue: {
+                issue_title: issue.issue_title,
+                 issue_text: issue.issue_text,
+                 created_by: issue.created_by,
+                assigned_to: issue.assigned_to,
+                status_text: issue.status_text
+              }
             };
 
           } else {
@@ -98,11 +103,14 @@ module.exports = function (app) {
               updatedProject = await issueHandler.updateProjectIssues(projectName, newIssue.id);
 
             response = {
-              issue_title: newIssue.issue_title,
-               issue_text: newIssue.issue_text,
-               created_by: newIssue.created_by,
-              assigned_to: newIssue.assigned_to,
-              status_text: newIssue.status_text
+              message: `New '${newIssue.issue_title}' issue created!`,
+              issue: {
+                issue_title: newIssue.issue_title,
+                 issue_text: newIssue.issue_text,
+                 created_by: newIssue.created_by,
+                assigned_to: newIssue.assigned_to,
+                status_text: newIssue.status_text
+              }
             };
 
           }
@@ -168,6 +176,7 @@ module.exports = function (app) {
             if(validInputs) {
               const updatedIssue = await issueHandler.updateIssueFromBody(issue, body);
               const response = {};
+              // TODO: Add checkbox value to open/close issue
               res.json({
                 message: 'Successfully updated issue!',
                 update: {
@@ -206,6 +215,7 @@ module.exports = function (app) {
           const projectIssues = project.issueIds.map(id => id.toString());
           const issueId = req.query._id;
           const foundInProjectIssues = projectIssues.indexOf(issueId) >= 0;
+          // TODO: Remove issue ID from project's issueIds array
           if(foundInProjectIssues) {
             issueHandler.deleteIssueById(issueId);
             res.json('Successfully deleted issue!');

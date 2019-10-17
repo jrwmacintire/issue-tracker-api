@@ -40,11 +40,11 @@ suite('Functional Tests', function() {
         .end(function(err, res){
           const { body } = res;
           assert.equal(res.status, 200);
-          assert.equal(body.issue_title, 'Title');
-          assert.equal(body.issue_text, 'text');
-          assert.equal(body.created_by, 'Functional Test - Every field filled in');
-          assert.equal(body.assigned_to, 'Chai and Mocha');
-          assert.equal(body.status_text, 'In QA');
+          assert.equal(body.issue.issue_title, 'Title');
+          assert.equal(body.issue.issue_text, 'text');
+          assert.equal(body.issue.created_by, 'Functional Test - Every field filled in');
+          assert.equal(body.issue.assigned_to, 'Chai and Mocha');
+          assert.equal(body.issue.status_text, 'In QA');
           done();
         });
       });
@@ -61,11 +61,11 @@ suite('Functional Tests', function() {
             if(err) throw err;
             const { body } = res;
             assert.equal(res.status, 200);
-            assert.equal(body.issue_title, 'Title2');
-            assert.equal(body.issue_text, 'text');
-            assert.equal(body.created_by, 'Functional Test - Required fields filled in');
-            assert.equal(body.assigned_to, '');
-            assert.equal(body.status_text, '');
+            assert.equal(body.issue.issue_title, 'Title2');
+            assert.equal(body.issue.issue_text, 'text');
+            assert.equal(body.issue.created_by, 'Functional Test - Required fields filled in');
+            assert.equal(body.issue.assigned_to, '');
+            assert.equal(body.issue.status_text, '');
             done();
           });
       });
@@ -274,18 +274,6 @@ suite('Functional Tests', function() {
             done();
           });
       });
-      
-      test('Valid _id', function(done) {
-        chai.request(server)
-          .delete('/api/issues/test')
-          .query({ _id: issueID })
-          .end(function(err, res) {
-            console.log(`res.body: `, res.body);
-            assert.equal(res.status, 200);
-            assert.equal(res.body, 'Successfully deleted issue!');
-            done();
-          });
-      });
 
       test('Invalid _id', function(done) {
         chai.request(server)
@@ -294,6 +282,19 @@ suite('Functional Tests', function() {
           .end(function(err, res) {
             assert.equal(res.status, 503);
             assert.equal(res.body, 'Failed to find issue in current project with the given ID.');
+            done();
+          });
+      });
+
+            
+      test('Valid _id', function(done) {
+        chai.request(server)
+          .delete('/api/issues/test')
+          .query({ _id: issueID })
+          .end(function(err, res) {
+            console.log(`res.body: `, res.body);
+            assert.equal(res.status, 200);
+            assert.equal(res.body, 'Successfully deleted issue!');
             done();
           });
       });
