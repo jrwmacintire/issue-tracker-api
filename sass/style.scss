@@ -40,10 +40,6 @@ body {
 
         section#userstories {
             div.examples {
-                background-color: ghostwhite;
-                padding: 1rem;
-                border: 1px solid lightgray;
-                margin-bottom: 2rem;
 
                 div {
                     margin: 0.5rem;
@@ -52,7 +48,7 @@ body {
         }
 
         section#testui {
-            margin: 4rem 0;
+            margin: 2rem 0;
 
             div.row > div {
                 min-width: 380px;
@@ -64,6 +60,17 @@ body {
 
             div > h3 {
                 text-align: center;
+            }
+
+            div.response {
+                background-color: ghostwhite;
+                padding: 1rem;
+                margin: 2rem;
+                border: 1px solid lightgray;
+                h2, h5 {
+                    text-align: center;
+                }
+
             }
 
             form {

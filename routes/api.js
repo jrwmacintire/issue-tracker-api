@@ -60,8 +60,6 @@ module.exports = function (app) {
       
       // console.log(`'POST' request received! | project: ${projectName}`);
 
-      // TODO: Add error to server response when an issue with the current title already exists.
-
       if(validatedBody) {
 
         try {
@@ -85,7 +83,7 @@ module.exports = function (app) {
           if(issue) {
             // console.log(`issue found!: `, issue);
             response = {
-              message: 'Issue found with that title.',
+              message: 'Issue exists with that title.',
               issue: {
                 issue_title: issue.issue_title,
                  issue_text: issue.issue_text,
@@ -144,7 +142,8 @@ module.exports = function (app) {
           'created_on', 
           'open',
           'assigned_to',
-          'created_by'
+          'created_by',
+          'status_text'
         ];
         let valid = true;
         inputs.forEach(input => {
@@ -206,21 +205,33 @@ module.exports = function (app) {
     
     .delete(async function (req, res){
       const projectName = req.params.project;
-      // console.log(`'DELETE' request received! | project: ${projectName}`);
+      console.log(`'DELETE' request received! | project: ${projectName}`);
+
+      // FIXME: Delete requests are not being received at 'apitest/'
 
       try {
-        if(!req.query._id) res.status(504).json('ID error deleting issue!');
-        else {
+        if(!req.query._id) {
+          res.status(504).json({
+            message: 'ID error deleting issue!'
+          });
+          // res.status(503).json({
+          //   message: `Failed to find issue in current project with the given ID.`
+          // });
+        } else {
           const project = await issueHandler.getProjectByName(projectName);
           const projectIssues = project.issueIds.map(id => id.toString());
           const issueId = req.query._id;
           const foundInProjectIssues = projectIssues.indexOf(issueId) >= 0;
-          // TODO: Remove issue ID from project's issueIds array
           if(foundInProjectIssues) {
             issueHandler.deleteIssueById(issueId);
-            res.json('Successfully deleted issue!');
+            res.json({ message: 'Successfully deleted issue!' });
           } else {
-            res.status(503).json(`Failed to find issue in current project with the given ID.`)
+            res.status(503).json({
+              message: `Failed to find issue in current project with the given ID.`
+            });
+            // res.status(504).json({
+            //   message: 'ID error deleting issue!'
+            // });
           }
         }
       } catch(err) {

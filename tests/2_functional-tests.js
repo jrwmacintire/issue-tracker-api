@@ -270,7 +270,7 @@ suite('Functional Tests', function() {
           .query({})
           .end(function(err, res) {
             assert.equal(res.status, 504);
-            assert.equal(res.body, 'ID error deleting issue!');
+            assert.equal(res.body.message, 'ID error deleting issue!');
             done();
           });
       });
@@ -281,7 +281,7 @@ suite('Functional Tests', function() {
           .query({ _id: 12345 })
           .end(function(err, res) {
             assert.equal(res.status, 503);
-            assert.equal(res.body, 'Failed to find issue in current project with the given ID.');
+            assert.equal(res.body.message, 'Failed to find issue in current project with the given ID.');
             done();
           });
       });
@@ -292,9 +292,9 @@ suite('Functional Tests', function() {
           .delete('/api/issues/test')
           .query({ _id: issueID })
           .end(function(err, res) {
-            console.log(`res.body: `, res.body);
+            // console.log(`res.body: `, res.body);
             assert.equal(res.status, 200);
-            assert.equal(res.body, 'Successfully deleted issue!');
+            assert.equal(res.body.message, 'Successfully deleted issue!');
             done();
           });
       });

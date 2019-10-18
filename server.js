@@ -18,7 +18,7 @@ const models    = require('./models/index.js').models;
 
 const app = express();
 
-app.use(helmet.xssFilter());
+// app.use(helmet.xssFilter());
 
 app.use('/public', express.static(process.cwd() + '/public'));
 

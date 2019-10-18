@@ -189,10 +189,9 @@ function IssueHandler() {
 
     this.deleteIssueByTitle = async (title) => {
         try {
-            await Issue.deleteOne({ issue_title: title }, () => {
-                console.log(`Delete successful for '${issue}' issue!`)
-            });
-            // TODO: Remove found issue's ID from project 'issueIds'
+            const deleted = await Issue.deleteOne({ issue_title: title });
+            const projectID = deleted.project_id.toString();
+            await Project.updateOne({ _id: projectID }, { $pull: { issueIds: id }});
         } catch(err) {
             throw err;
         }
@@ -201,7 +200,6 @@ function IssueHandler() {
     this.deleteIssueById = async (id) => {
         try {
             const issue = await Issue.findOneAndDelete({ _id: id });
-            // TODO: Remove found issue's ID from project 'issueIds'
             const projectID = issue.project_id.toString();
             await Project.updateOne({ _id: projectID }, { $pull: { issueIds: id }});
         } catch(err) {

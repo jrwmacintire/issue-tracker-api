@@ -16,21 +16,23 @@ body {
     margin-top: 4rem; }
   body div.container section:last-child {
     margin-bottom: 4rem; }
-  body div.container section#userstories div.examples {
-    background-color: ghostwhite;
-    padding: 1rem;
-    border: 1px solid lightgray;
-    margin-bottom: 2rem; }
-    body div.container section#userstories div.examples div {
-      margin: 0.5rem; }
+  body div.container section#userstories div.examples div {
+    margin: 0.5rem; }
   body div.container section#testui {
-    margin: 4rem 0; }
+    margin: 2rem 0; }
     body div.container section#testui div.row > div {
       min-width: 380px; }
     body div.container section#testui div > h3 > i {
       color: #008385; }
     body div.container section#testui div > h3 {
       text-align: center; }
+    body div.container section#testui div.response {
+      background-color: ghostwhite;
+      padding: 1rem;
+      margin: 2rem;
+      border: 1px solid lightgray; }
+      body div.container section#testui div.response h2, body div.container section#testui div.response h5 {
+        text-align: center; }
     body div.container section#testui form {
       display: flex;
       flex-direction: column; }
