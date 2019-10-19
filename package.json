@@ -27,7 +27,7 @@
     "test": "mocha test",
     "start": "nodemon server.js",
     "dev-server": "browser-sync start --proxy localhost:3000 --files 'public/*.css, views/*.html, routes/*.js, controllers/*.js, models/*.js'",
-    "sass": "sass --watch sass/style.scss:public/styles.css"
+    "sass": "sass --watch sass:public"
   },
   "repository": {
     "type": "git",

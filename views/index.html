@@ -2,12 +2,11 @@
 <html>
   <head>
     <title>Issue Tracker API - JohnMacIntire.com</title>
-    <meta name="description" content="A cool thing made with HyperDev">
-    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+    <meta name="description" content="Issue Tracker API by John MacIntire">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="public/styles.css">
+    <link rel="stylesheet" type="text/css" href="public/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   </head>
@@ -93,7 +92,7 @@
           <div class="col-md-4">
             <h3>Delete issue at <i>/apitest</i></h3>
             <hr>
-            <form id="testForm2">
+            <form id="testForm3">
               <div class="form-group row">
                 <label for="_id" class="col-sm-4"><b>_id:</b></label>
                 <input class="col-sm-8" type="text" name="_id" placeholder="_id (required)" required=''>
@@ -103,16 +102,16 @@
               </div>
             </form>
           </div>
-          <!-- TODO: Improve JSON result output -->
           <div class="response col-xs-10 col-sm-10 col-md-9 col-lg-7">
             <h3>Server Response:</h3>
             <div id='jsonResult'></div>
-          </div>
+          </div> 
         </div>
       </section>
       <section id='userstories'>
         <div class="row">
           <div class="examples col-xs-11 col-sm-11 col-md-10 col-lg-8">
+            <hr>
             <div>
               <h3>Example get usage:</h3>
               <code>/api/issues/{project}</code>
@@ -130,6 +129,7 @@
         </div>
         <div class="row">
           <div class="col-xs-11 col-sm-11 col-md-10 col-lg-8">
+            <hr>
             <h3>User Stories</h3>
             <ol>
               <li>Prevent cross site scripting(XSS attack).</li>
@@ -166,7 +166,7 @@
               data: $('#testForm').serialize(),
               success: function(data) {
                 const { message, issue } = data;
-                $('#jsonResult').html(`<h5>${message}</h5>`);
+                $('#jsonResult').html(`<p>${message}</p><code>${JSON.stringify(issue)}</code>`);
               }
             });
             e.preventDefault();
@@ -177,8 +177,9 @@
               type: 'put',
               data: $('#testForm2').serialize(),
               success: function(data) {
-                const { message, issue } = data;
-                $('#jsonResult').html(`<h5>${message}</h5>`);
+                const { message, update } = data;
+                if(update) $('#jsonResult').html(`<p>${message}</p><code>${JSON.stringify(update)}</code>`);
+                else $('#jsonResult').html(`<p>${message}</p>`);
               }
             });
             e.preventDefault();
@@ -189,8 +190,8 @@
               type: 'delete',
               data: $('#testForm3').serialize(),
               success: function(data) {
-                const { message, issue } = data;
-                $('#jsonResult').html(`<h5>${message}</h5>`);
+                const { message } = data;
+                $('#jsonResult').html(`<p>${message}</p>`);
               }
             });
             e.preventDefault();

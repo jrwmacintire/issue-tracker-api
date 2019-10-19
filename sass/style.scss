@@ -47,6 +47,10 @@ body {
             }
         }
 
+        section#ui {
+            margin: 2rem 0;
+        }
+
         section#testui {
             margin: 2rem 0;
 
@@ -64,11 +68,19 @@ body {
 
             div.response {
                 background-color: ghostwhite;
-                padding: 1rem;
+                padding: 2rem;
                 margin: 2rem;
                 border: 1px solid lightgray;
-                h2, h5 {
+                h2, p {
                     text-align: center;
+                }
+
+                h2 {
+                    margin-bottom: 0.5rem;
+                }
+
+                p {
+                    font-size: 1.2rem;
                 }
 
             }

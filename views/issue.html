@@ -2,36 +2,81 @@
 <html>
   <head>
     <title>Issue Tracker API - JohnMacIntire.com</title>
-    <meta name="description" content="A cool thing made with HyperDev">
-    <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
+    <meta name="description" content="Issue Tracker API by John MacIntire">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="public/styles.css">
+    <link rel="stylesheet" type="text/css" href="../public/issue.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
   <body>
-    <header>
-      <h1 id='projectTitle'></h1>
-    </header>
-      <div id='submitNewIssue'>
-        <br>
-        <h3>Submit a new issue:</h3>
-        <!-- TODO: Update form with Bootstrap styling -->
-        <form id="newIssue" method="post" action="/api/">
-          <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;" required=''><br>
-          <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;" required=''></textarea><br>
-          <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required=''>
-          <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px">
-          <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-          <button type="submit">Submit Issue</button>
-        </form>
-      </div>
-      
-      <!-- TODO: Improve layout of all issues on project page -->
-      <div id='issueDisplay'></div>
-      
-      <hr>
+    <div class="container">
+      <section id="header">
+        <div class="row">
+          <div class="col-xs-11 col-sm-11 col-md-10 col-lg-8">
+            <h1>Issue Tracker API</h1>
+            <h2 id='projectTitle'>
+              All issues for: <span class="projectName"></span>
+            </h2>
+            <hr>
+          </div>
+        </div>
+      </section>
+      <section id="ui">
+        <div id='submitNewIssue' class="row">
+          <div class="col-md-6">
+            <h3>Submit a new issue to <span class="projectName"></span> : </h3>
+            <form id="newIssue" method="post" action="/api/">
+              <div class="form-group row">
+                <label class="col-md-4" for="issue_title"><b>Issue Title: </b></label>
+                <input type="text" name="issue_title" class="col-md-8" placeholder="Issue Title (required)" style="width: 320px; margin-bottom: 3px;" required=''><br>
+              </div>
+              <div class="form-group row">
+                <label for="issue_text" class="col-md-4"><b>Issue Text: </b></label>
+                <textarea type="text" name="issue_text" class="col-md-8" placeholder="Issue Text (required)" style="width: 320px; height: 100px;" required=''></textarea><br>
+              </div>
+              <div class="form-group row">
+                <label for="created_by" class="col-md-4"><b>Created By: </b></label>
+                <input type="text" name="created_by" class="col-md-8" placeholder="Created by (required)" style="width: 100px" required=''>
+              </div>
+              <div class="form-group row">
+                <label for="assigned_to" class="col-md-4"><b>Assigned To: </b></label>
+                <input type="text" name="assigned_to" class="col-md-8" placeholder="Assigned to (optional)" style="width: 100px">
+              </div>
+              <div class="form-group row">
+                <label for="status_text" class="col-md-4"><b>Status Text: </b></label>
+                <input type="text" name="status_text" class="col-md-8" placeholder="Status text (optional)" style="width: 100px"><br>
+              </div>
+              <div class="form-group row">
+                <div class="col-md-6">
+                  <button type="submit">Submit Issue</button>
+                </div>
+              </div>
+            </form>
+            <div id="serverResponse">
+              <h4></h4>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="display">
+        <div class="row">
+          <div id='issueDisplay' class="col-xs-11 col-sm-11 col-md-10 col-lg-8">
+            
+          </div>
+        </div>
+      </section>
+      <section id="footer">
+        <div class="row">
+          <div class="col-xs-11 col-sm-11 col-md-10 col-lg-8">
+            <h5>
+              Built for <a href="https://www.freecodecamp.org/">FreeCodeCamp.org's</a><br>
+              Information Security & Quality Assurance Project 4
+            </h5>
+          </div>
+        </div>
+      </section>
+    </div>
     
     <script src="https://code.jquery.com/jquery-2.2.1.min.js"
             integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
@@ -40,7 +85,7 @@
       $(function() {
         var currentProject = window.location.pathname.replace(/\//g, "");;
         var url = "/api/issues/"+currentProject;
-        $('#projectTitle').text('All issues for: '+currentProject)
+        $('span.projectName').text(currentProject)
         $.ajax({
           type: "GET",
           url: url,
@@ -51,20 +96,20 @@
               console.log(ele);
               var openstatus;
               (ele.open) ? openstatus = 'open' : openstatus = 'closed';
-              // TODO: Ensure that 'close' button closes issue
-              // TODO: Ensure that 'delete' button deletes issue
-              // TODO: Improve layout of issues
+              // TODO: When a closed issue is updated, the issue should re-open
+              // TODO: Alert user of issue being reopened. Abort if cancelled?
               var single = [
+                '<hr>',
                 '<div class="issue '+openstatus+'">',
-                '<p class="id">id: '+ele._id+'</p>',
                 '<h3>'+ele.issue_title+' -  ('+openstatus+')</h3>',
-                '<br>',
-                '<p>'+ele.issue_text+'</p>',
-                '<p>'+ele.status_text+'</p>',
-                '<br>',
-                '<p class="id"><b>Created by:</b> '+ele.created_by+'  <b>Assigned to:</b> '+ele.assigned_to,
-                '<p class="id"><b>Created on:</b> '+ele.created_on+'  <b>Last updated:</b> '+ele.updated_on,
-                '<br><a href="#" class="closeIssue" id="'+ele._id+'">close?</a> <a href="#" class="deleteIssue" id="'+ele._id+'">delete?</a>',
+                '<p class="id"><b>_id:</b> '+ele._id+'</p>',
+                '<p><b>Issue Text:</b> '+ele.issue_text+'</p>',
+                '<p><b>Issue Status Text:</b> '+ele.status_text+'</p>',
+                '<p class="id"><b>Created by:</b> '+ele.created_by+'</p>',
+                '<p class="id"><b>Assigned to:</b> '+ele.assigned_to+'</p>',
+                '<p class="id"><b>Created on:</b> '+ele.created_on+'</p>',
+                '<p class="id"><b>Last updated:</b> '+ele.updated_on+'</p>',
+                '<p class="id"><a href="#" class="closeIssue" id="'+ele._id+'">close?</a> <a href="#" class="deleteIssue" id="'+ele._id+'">delete?</a></p>',
                 '</div>'
               ];
               issues.push(single.join(''));
@@ -74,14 +119,18 @@
         });
         
         $('#newIssue').submit(function(e){
-          e.preventDefault();
+          // e.preventDefault();
           $(this).attr('action', "/api/issues/" + currentProject);
           $.ajax({
             type: "POST",
             url: url,
             data: $(this).serialize(),
-            success: function(data) { window.location.reload(true); }
+            success: function(data) {
+              const { message } = data;
+              $('#serverResponse > h4').text(message);
+            }
           });
+          e.preventDefault();
         });
         
         $('#issueDisplay').on('click','.closeIssue', function(e) {
@@ -100,7 +149,11 @@
             type: "DELETE",
             url: url,
             data: {_id: $(this).attr('id')},
-            success: function(data) { alert(data); window.location.reload(true); }
+            success: function(data) { 
+              const { message } = data;
+              alert(message);
+              window.location.reload(true);
+            }
           });
           e.preventDefault();
         });

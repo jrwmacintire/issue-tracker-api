@@ -89,7 +89,8 @@ module.exports = function (app) {
                  issue_text: issue.issue_text,
                  created_by: issue.created_by,
                 assigned_to: issue.assigned_to,
-                status_text: issue.status_text
+                status_text: issue.status_text,
+                       open: issue.open
               }
             };
 
@@ -107,7 +108,8 @@ module.exports = function (app) {
                  issue_text: newIssue.issue_text,
                  created_by: newIssue.created_by,
                 assigned_to: newIssue.assigned_to,
-                status_text: newIssue.status_text
+                status_text: newIssue.status_text,
+                       open: newIssue.open
               }
             };
 
@@ -133,7 +135,7 @@ module.exports = function (app) {
       const inputs      = Object.keys(body);
       const inputsOnBody = inputs.length;
 
-      async function validateInputs() {
+      async function validateInputs(rawInputs) {
         const validFields = [
           '_id',
           'issue_title',
@@ -146,7 +148,7 @@ module.exports = function (app) {
           'status_text'
         ];
         let valid = true;
-        inputs.forEach(input => {
+        rawInputs.forEach(input => {
           if(validFields.indexOf(input) < 0) valid = false;
         });
         return await valid;
@@ -162,28 +164,29 @@ module.exports = function (app) {
               message: 'Successfully updated issue!',
               update: {
                 issue_title: issue.issue_title,
-                issue_text: issue.issue_text,
-                created_by: issue.created_by,
+                 issue_text: issue.issue_text,
+                 created_by: issue.created_by,
                 assigned_to: issue.assigned_to,
-                status_text: issue.status_text
+                status_text: issue.status_text,
+                       open: issue.open
               }
             });
           } else if(issue && inputsOnBody > 1) {
             // validate and update all other inputs on issue
             // console.log(`'inputs' from 'body': `, inputs, body);
-            const validInputs = validateInputs();
+            const validInputs = validateInputs(inputs);
             if(validInputs) {
               const updatedIssue = await issueHandler.updateIssueFromBody(issue, body);
               const response = {};
-              // TODO: Add checkbox value to open/close issue
               res.json({
                 message: 'Successfully updated issue!',
                 update: {
                   issue_title: updatedIssue.issue_title,
-                  issue_text: updatedIssue.issue_text,
-                  created_by: updatedIssue.created_by,
+                   issue_text: updatedIssue.issue_text,
+                   created_by: updatedIssue.created_by,
                   assigned_to: updatedIssue.assigned_to,
-                  status_text: updatedIssue.status_text
+                  status_text: updatedIssue.status_text,
+                         open: updatedIssue.open
                 }
               });
             } else {
@@ -193,7 +196,7 @@ module.exports = function (app) {
             throw Error('Cannot find an issue with that ID.');
           }
         } catch(err) {
-          res.json(err);
+          res.json({ message: 'Issue not found! Please try again.' });
         }
 
       } else {
@@ -205,37 +208,29 @@ module.exports = function (app) {
     
     .delete(async function (req, res){
       const projectName = req.params.project;
-      console.log(`'DELETE' request received! | project: ${projectName}`);
-
-      // FIXME: Delete requests are not being received at 'apitest/'
+      // console.log(`'DELETE' request received! | project: ${projectName}`);
 
       try {
-        if(!req.query._id) {
-          res.status(504).json({
+        if(!req.query._id && !req.body._id) {
+          res.status(201).json({
             message: 'ID error deleting issue!'
           });
-          // res.status(503).json({
-          //   message: `Failed to find issue in current project with the given ID.`
-          // });
         } else {
           const project = await issueHandler.getProjectByName(projectName);
           const projectIssues = project.issueIds.map(id => id.toString());
-          const issueId = req.query._id;
+          const issueId = req.query._id || req.body._id;
           const foundInProjectIssues = projectIssues.indexOf(issueId) >= 0;
           if(foundInProjectIssues) {
             issueHandler.deleteIssueById(issueId);
             res.json({ message: 'Successfully deleted issue!' });
           } else {
-            res.status(503).json({
+            res.status(202).json({
               message: `Failed to find issue in current project with the given ID.`
             });
-            // res.status(504).json({
-            //   message: 'ID error deleting issue!'
-            // });
           }
         }
       } catch(err) {
-        res.json(err);
+        res.json({ message: 'Failed to delete issue. Please retry your input.'});
       }
 
     });
